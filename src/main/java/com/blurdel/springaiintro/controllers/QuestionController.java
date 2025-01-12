@@ -1,6 +1,7 @@
 package com.blurdel.springaiintro.controllers;
 
 import com.blurdel.springaiintro.model.Answer;
+import com.blurdel.springaiintro.model.GetCapitalRequest;
 import com.blurdel.springaiintro.model.Question;
 import com.blurdel.springaiintro.services.OpenAIService;
 import org.springframework.http.HttpStatus;
@@ -18,9 +19,15 @@ public class QuestionController {
         this.aiService = aiService;
     }
 
+    @PostMapping("/capital")
+    public Answer getCapital(@RequestBody final GetCapitalRequest getCapitalRequest) {
+        return aiService.getCapital(getCapitalRequest);
+    }
+
     @PostMapping("/ask")
     public ResponseEntity<?> askQuestion(@RequestBody final Question question) {
         Answer answer = aiService.getAnswer(question);
         return new ResponseEntity<>(answer, HttpStatus.OK);
     }
+
 }
