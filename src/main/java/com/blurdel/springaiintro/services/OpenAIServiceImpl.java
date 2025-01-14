@@ -2,6 +2,7 @@ package com.blurdel.springaiintro.services;
 
 import com.blurdel.springaiintro.model.Answer;
 import com.blurdel.springaiintro.model.GetCapitalRequest;
+import com.blurdel.springaiintro.model.GetCapitalResponse;
 import com.blurdel.springaiintro.model.Question;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -10,6 +11,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -46,24 +48,19 @@ public class OpenAIServiceImpl implements OpenAIService {
     }
 
     @Override
-    public Answer getCapital(GetCapitalRequest getCapitalRequest) {
+    public GetCapitalResponse getCapital(GetCapitalRequest getCapitalRequest) {
+        BeanOutputConverter<GetCapitalResponse> converter = new BeanOutputConverter<>(GetCapitalResponse.class);
+        String format = converter.getFormat();
+        System.out.println("Req format:\n" + format);
+
         PromptTemplate pt = new PromptTemplate(getCapitalPrompt);
-        Prompt prompt = pt.create(Map.of("stateOrCountry", getCapitalRequest.stateOrCountry()));
+        Prompt prompt = pt.create(Map.of("stateOrCountry", getCapitalRequest.stateOrCountry(),
+                "format", format));
+
         ChatResponse response = chatModel.call(prompt);
-
         System.out.println(response.getResult().getOutput().getContent());
-        String resp = response.getResult().getOutput().getContent();
-        try {
-            resp = resp.replaceAll("json", "");
-            resp = resp.replaceAll("`", "");
 
-            JsonNode node = objMapper.readTree(resp);
-            resp = node.get("answer").asText();
-
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        return new Answer(resp);
+        return converter.convert(response.getResult().getOutput().getContent());
     }
 
     @Override
