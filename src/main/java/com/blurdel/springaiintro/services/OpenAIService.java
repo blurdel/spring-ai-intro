@@ -8,6 +8,7 @@ public interface OpenAIService {
 
     String getAnswer(String question);
 
+    Answer getCapitalWithInfo(GetCapitalRequest getCapitalRequest);
     Answer getCapital(GetCapitalRequest getCapitalRequest);
     Answer getAnswer(Question question);
 }

@@ -19,6 +19,11 @@ public class QuestionController {
         this.aiService = aiService;
     }
 
+    @PostMapping("/capitalWithInfo")
+    public Answer getCapitalWithInfo(@RequestBody final GetCapitalRequest getCapitalRequest) {
+        return aiService.getCapitalWithInfo(getCapitalRequest);
+    }
+
     @PostMapping("/capital")
     public Answer getCapital(@RequestBody final GetCapitalRequest getCapitalRequest) {
         return aiService.getCapital(getCapitalRequest);

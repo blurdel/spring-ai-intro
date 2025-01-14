@@ -3,10 +3,14 @@ package com.blurdel.springaiintro.services;
 import com.blurdel.springaiintro.model.Answer;
 import com.blurdel.springaiintro.model.GetCapitalRequest;
 import com.blurdel.springaiintro.model.Question;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -21,9 +25,24 @@ public class OpenAIServiceImpl implements OpenAIService {
     @Value("classpath:templates/get-capital-prompt.st")
     private Resource getCapitalPrompt;
 
+    @Value("classpath:templates/get-capital-with-info.st")
+    private Resource getCapitalPromptWithInfo;
+
+    @Autowired
+    private ObjectMapper objMapper;
+
 
     public OpenAIServiceImpl(ChatModel chatModel) {
         this.chatModel = chatModel;
+    }
+
+    @Override
+    public Answer getCapitalWithInfo(GetCapitalRequest getCapitalRequest) {
+        PromptTemplate pt = new PromptTemplate(getCapitalPromptWithInfo);
+        Prompt prompt = pt.create(Map.of("stateOrCountry", getCapitalRequest.stateOrCountry()));
+        ChatResponse response = chatModel.call(prompt);
+
+        return new Answer(response.getResult().getOutput().getContent());
     }
 
     @Override
@@ -32,7 +51,19 @@ public class OpenAIServiceImpl implements OpenAIService {
         Prompt prompt = pt.create(Map.of("stateOrCountry", getCapitalRequest.stateOrCountry()));
         ChatResponse response = chatModel.call(prompt);
 
-        return new Answer(response.getResult().getOutput().getContent());
+        System.out.println(response.getResult().getOutput().getContent());
+        String resp = response.getResult().getOutput().getContent();
+        try {
+            resp = resp.replaceAll("json", "");
+            resp = resp.replaceAll("`", "");
+
+            JsonNode node = objMapper.readTree(resp);
+            resp = node.get("answer").asText();
+
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return new Answer(resp);
     }
 
     @Override
