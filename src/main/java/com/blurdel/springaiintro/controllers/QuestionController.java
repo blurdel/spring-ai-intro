@@ -3,6 +3,7 @@ package com.blurdel.springaiintro.controllers;
 import com.blurdel.springaiintro.model.Answer;
 import com.blurdel.springaiintro.model.GetCapitalRequest;
 import com.blurdel.springaiintro.model.GetCapitalResponse;
+import com.blurdel.springaiintro.model.GetCapitalWithInfoResponse;
 import com.blurdel.springaiintro.model.Question;
 import com.blurdel.springaiintro.services.OpenAIService;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class QuestionController {
     }
 
     @PostMapping("/capitalWithInfo")
-    public Answer getCapitalWithInfo(@RequestBody final GetCapitalRequest getCapitalRequest) {
+    public GetCapitalWithInfoResponse getCapitalWithInfo(@RequestBody final GetCapitalRequest getCapitalRequest) {
         return aiService.getCapitalWithInfo(getCapitalRequest);
     }
 
