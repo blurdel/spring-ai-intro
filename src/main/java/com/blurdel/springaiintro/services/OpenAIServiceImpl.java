@@ -17,6 +17,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class OpenAIServiceImpl implements OpenAIService {
@@ -49,9 +50,9 @@ public class OpenAIServiceImpl implements OpenAIService {
         Prompt prompt = pt.create(Map.of("stateOrCountry", getCapitalRequest.stateOrCountry(),
                 "format", format));
         ChatResponse response = chatModel.call(prompt);
-        System.out.println(response.getResult().getOutput().getContent());
+        System.out.println(response.getResult().getOutput().getText());
 
-        return converter.convert(response.getResult().getOutput().getContent());
+        return converter.convert(Objects.requireNonNull(response.getResult().getOutput().getText()));
     }
 
     @Override
@@ -65,9 +66,9 @@ public class OpenAIServiceImpl implements OpenAIService {
                 "format", format));
 
         ChatResponse response = chatModel.call(prompt);
-        System.out.println(response.getResult().getOutput().getContent());
+        System.out.println(response.getResult().getOutput().getText());
 
-        return converter.convert(response.getResult().getOutput().getContent());
+        return converter.convert(Objects.requireNonNull(response.getResult().getOutput().getText()));
     }
 
     @Override
@@ -78,8 +79,8 @@ public class OpenAIServiceImpl implements OpenAIService {
         Prompt prompt = pt.create();
         ChatResponse resp = chatModel.call(prompt);
 
-        System.out.println(resp.getResult().getOutput().getContent());
-        return new Answer(resp.getResult().getOutput().getContent());
+        System.out.println(resp.getResult().getOutput().getText());
+        return new Answer(resp.getResult().getOutput().getText());
     }
 
     @Override
@@ -88,7 +89,7 @@ public class OpenAIServiceImpl implements OpenAIService {
         Prompt prompt = pt.create();
         ChatResponse resp = chatModel.call(prompt);
 
-        return resp.getResult().getOutput().getContent();
+        return resp.getResult().getOutput().getText();
     }
 
 }

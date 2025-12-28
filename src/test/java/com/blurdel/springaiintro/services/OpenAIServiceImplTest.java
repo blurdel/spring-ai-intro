@@ -16,7 +16,7 @@ class OpenAIServiceImplTest {
 
     @Test
     void getAnswer() {
-        Answer answer = service.getAnswer(new Question("4 + 4 = ?"));
+        Answer answer = service.getAnswer(new Question("What is the meaning of life?"));
         System.out.println("Got the answer");
         System.out.println(answer);
     }
